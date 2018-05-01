@@ -2,8 +2,6 @@
   "captive_portal_server": "http://captive.v2ex.co/generate_204",
   "interval_retry_connection": 30,
   "max_times_retry_login": 5,
-  "interval_retry_login": 30,
-  "interval_check_status": 60,
   "password": "YOUR_PASSWD",
   "username": "YOUR_ID"
 }
