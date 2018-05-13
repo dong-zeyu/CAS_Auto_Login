@@ -3,13 +3,19 @@ import logging
 import os
 import re
 import sys
+import traceback
 from time import sleep
 
 import requests
 from bs4 import BeautifulSoup
 
-logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.DEBUG)
+logging.basicConfig(
+    format="[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s",
+    datefmt='%Y/%b/%d %H:%M:%S',
+    level=logging.DEBUG,
+    filename='CASLogin.log')
 logging.getLogger('requests').setLevel(logging.WARNING)
+
 login = requests.session()
 
 CONNECTED = 10001
@@ -124,4 +130,7 @@ def main():
 
 
 if __name__ == '__main__':
-   main()
+   try:
+      main()
+   except Exception as e:
+      logging.error("".join(traceback.format_exc()))
