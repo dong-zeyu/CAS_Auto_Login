@@ -60,23 +60,21 @@ def do_login(url, username, password):
 def test_network(url):
    try:
       with login.get(url, timeout=10, allow_redirects=False) as test:
-          if test.status_code == 200:
-             status = CONNECTED
+          if 300 > test.status_code >= 200:
+             return CONNECTED, None
           elif test.status_code == 302:
              content = login.get(test.headers['Location'], timeout=10).content
              soup_login = BeautifulSoup(content, 'html5lib')
              if 'CAS' not in soup_login.title.string:
                 logging.warning('Not connected to a SUSTC network')
-                status = CONNECTED
+                return CONNECTED, None
              else:
-                status = NEED_LOGIN
+                return NEED_LOGIN, re.search(r'window\.location = \'(.*)\';', soup_login.text).group(1)
           else:
              logging.warning('Recieved status code {code}, consider updating \'captive_portal_server\''.format(code=test.status_code))
-             status = CONNECTION_TIMEOUT
+             return CONNECTION_TIMEOUT, None
    except requests.RequestException:
-       status = CONNECTION_TIMEOUT
-   
-   return status
+       return CONNECTION_TIMEOUT, None
 
 
 def main():
@@ -94,7 +92,7 @@ def main():
    
    while True:
       logging.info('Checking network status...')
-      status = test_network(test_url)
+      status, rem_link = test_network(test_url)
       if status == CONNECTION_TIMEOUT:
          logging.info('Connection FAILED. Try again in ' + str(config['interval_retry_connection']) + ' sec.')
          times_retry_login -= 1
@@ -105,7 +103,6 @@ def main():
          logging.info('You are offline. Starting login...')
 
          hostname = 'http://enet.10000.gd.cn:10001/sz/sz112/'
-         rem_link = re.search(r'window\.location = \'(.*)\';', soup_login.text).group(1)
          url = hostname + rem_link
 
          success, err = do_login(url, config['username'], config['password'])
