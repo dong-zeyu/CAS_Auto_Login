@@ -11,7 +11,7 @@ import requests
 from time import sleep
 from bs4 import BeautifulSoup
 
-from urllib3.exceptions import ResponseError
+from requests.exceptions import HTTPError
 from requests.exceptions import ConnectionError
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
@@ -66,7 +66,7 @@ def test_network(url):
         elif test.status_code == 302:
             return test.headers['Location']
         else:
-            raise ResponseError("Invalid status code {code}".format(code=test.status_code))
+            raise HTTPError("Invalid status code {code}".format(code=test.status_code))
 
 def main():
     logger.info('Program started.')
@@ -119,7 +119,7 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except ResponseError as err:
+    except HTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
     except Exception as e:
         logger.error("".join(traceback.format_exc()))
