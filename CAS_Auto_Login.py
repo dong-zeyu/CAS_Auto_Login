@@ -58,13 +58,13 @@ def do_login(url, username, password):
 
 
 def test_network(url):
-   with login.get(url, timeout=10, allow_redirects=False) as test:
-      if 300 > test.status_code >= 200:
-         return None
-      elif test.status_code == 302:
-         return test.headers['Location']
-      else:
-         raise ResponseError("Invalid status code {code}".format(code=test.status_code))
+    with login.get(url, timeout=10, allow_redirects=False) as test:
+        if 300 > test.status_code >= 200:
+            return None
+        elif test.status_code == 302:
+            return test.headers['Location']
+        else:
+            raise ResponseError("Invalid status code {code}".format(code=test.status_code))
 
 def main():
     logger.info('Program started.')
