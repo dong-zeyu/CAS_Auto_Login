@@ -14,6 +14,8 @@ from bs4 import BeautifulSoup
 from urllib3.exceptions import ResponseError
 from requests.exceptions import ConnectionError
 
+os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
+
 logging.basicConfig(
     format="[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s",
     datefmt='%Y/%b/%d %H:%M:%S',
@@ -69,7 +71,6 @@ def test_network(url):
 def main():
     logger.info('Program started.')
     
-    os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))  # To read config in the same directory
     
     config = load_config()
     times_retry_login = config['max_times_retry_login']
