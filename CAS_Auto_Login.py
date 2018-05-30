@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import json
 import logging
@@ -123,4 +123,3 @@ if __name__ == '__main__':
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
     except Exception as e:
         logger.error("".join(traceback.format_exc()))
- 
