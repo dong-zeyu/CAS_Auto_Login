@@ -69,10 +69,8 @@ def test_network(url):
 def main():
     logger.info('Program started.')
     
-    try:
-        os.chdir(os.path.dirname(sys.argv[0]))  # To read config in the same directory
-    except OSError:
-        pass
+    os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))  # To read config in the same directory
+    
     config = load_config()
     times_retry_login = config['max_times_retry_login']
     test_url = config['captive_portal_server']
