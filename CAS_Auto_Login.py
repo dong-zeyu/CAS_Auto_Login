@@ -103,19 +103,20 @@ def main():
                 
                 if err:
                     logger.error('Error occurred: ' + err.text)
-                    times_retry_login -= 1
                 elif success:
                     logger.info('Login successful')
                     return
         except ConnectionError as err:
-            logger.warn('Connection FAILED. Try again in ' + str(config['interval_retry_connection']) + ' sec.')
-            times_retry_login -= 1
+            logger.warn('Connection FAILED.')
         
         # If keep trying to login too many times, it may trigger security alarm on the CAS server
-        logger.info('Try again in {time} sec. {attempt} attempt(s) remaining.'.format(time=config['interval_retry_connection'], attempt=times_retry_login))
+        times_retry_login -= 1
+        logger.info('{attempt} attempt(s) remaining.'.format(attempt=times_retry_login))
         if times_retry_login <= 0:
             logger.error('Attempts used up. The program will quit.')
             raise RetryError
+        logger.info('Try again in {time} sec. '.format(time=config['interval_retry_connection']))
+        sleep(config['interval_retry_connection'])
 
 
 if __name__ == '__main__':
