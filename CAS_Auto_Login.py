@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 
 from requests.exceptions import HTTPError
 from requests.exceptions import ConnectionError
+from requests.exceptions import RetryError
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 
@@ -77,7 +78,7 @@ def main():
     test_url = config['captive_portal_server']
     logger.info('Configurations successfully imported.')
     
-    while times_retry_login >= 0:
+    while True:
         logger.info('Checking network status...')
         try:
             link = test_network(test_url)
@@ -112,14 +113,20 @@ def main():
         
         # If keep trying to login too many times, it may trigger security alarm on the CAS server
         logger.info('Try again in {time} sec. {attempt} attempt(s) remaining.'.format(time=config['interval_retry_connection'], attempt=times_retry_login))
-    
-    logger.error('Attempts used up. The program will quit.')
+        if times_retry_login <= 0:
+            logger.error('Attempts used up. The program will quit.')
+            raise RetryError
 
 
 if __name__ == '__main__':
     try:
-        main()
+        config = load_config()
+        while True:
+            main()
+            sleep(config['interval_check_network'])
     except HTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
+    except RetryError:
+        sys.exit(-1)
     except Exception as e:
         logger.error("".join(traceback.format_exc()))
