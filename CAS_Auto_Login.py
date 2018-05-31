@@ -11,8 +11,8 @@ import requests
 from time import sleep
 from bs4 import BeautifulSoup
 
-from requests.exceptions import HTTPError
-from requests.exceptions import ConnectionError
+from requests.exceptions import BaseHTTPError
+from requests.exceptions import RequestException
 from requests.exceptions import RetryError
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
@@ -67,7 +67,7 @@ def test_network(url):
         elif test.status_code == 302:
             return test.headers['Location']
         else:
-            raise HTTPError("Invalid status code {code}".format(code=test.status_code))
+            raise BaseHTTPError("Invalid status code {code}".format(code=test.status_code))
 
 def main():
     logger.info('Program started.')
@@ -106,8 +106,8 @@ def main():
                 elif success:
                     logger.info('Login successful')
                     return
-        except ConnectionError as err:
-            logger.warn('Connection FAILED.')
+        except RequestException as err:
+            logger.warn('Network FAILED.')
         
         # If keep trying to login too many times, it may trigger security alarm on the CAS server
         times_retry_login -= 1
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         while True:
             main()
             sleep(config['interval_check_network'])
-    except HTTPError as err:
+    except BaseHTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
     except RetryError:
         sys.exit(-1)
