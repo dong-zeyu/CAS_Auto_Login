@@ -69,9 +69,20 @@ def test_network(url):
         else:
             raise BaseHTTPError("Invalid status code {code}".format(code=test.status_code))
 
+
+def check_ip():
+    try:
+        import socket
+        conn = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        conn.connect(('172.18.6.71', 12312))
+        ip = conn.recv(128)
+        logger.info("Your ip is: {ip}".format(ip=ip.decode()))
+    except Exception as e:
+        logger.error("Cannot get ip address: {msg}".format(msg=str(e)))
+
+
 def main():
     logger.info('Program started.')
-    
     
     config = load_config()
     times_retry_login = config['max_times_retry_login']
@@ -105,6 +116,7 @@ def main():
                     logger.error('Error occurred: ' + err.text)
                 elif success:
                     logger.info('Login successful')
+                    check_ip()
                     return
         except RequestException as err:
             logger.warn('Network FAILED.')
