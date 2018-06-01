@@ -22,7 +22,7 @@ logging.basicConfig(
     datefmt='%Y/%b/%d %H:%M:%S',
     handlers=[logging.FileHandler(filename='CASLogin.log', mode='a'), logging.StreamHandler()])
 logger = logging.getLogger("CASLogin")
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 login = requests.session()
 
@@ -40,8 +40,6 @@ def do_login(url, username, password):
     for element in soup_login.find('form', id='fm1').find_all('input'):
         if element.has_attr('value'):
             info[element['name']] = element['value']
-
-    logger.info('Login information acquired.')
 
     info['username'] = username
     info['password'] = password
@@ -82,12 +80,12 @@ def check_ip():
 
 
 def main():
-    logger.info('Program started.')
+    logger.debug('Program started.')
     
     config = load_config()
     times_retry_login = config['max_times_retry_login']
     test_url = config['captive_portal_server']
-    logger.info('Configurations successfully imported.')
+    logger.debug('Configurations successfully imported.')
     
     while True:
         logger.info('Checking network status...')
@@ -113,7 +111,7 @@ def main():
                 success, err = do_login(service, config['username'], config['password'])
                 
                 if err:
-                    logger.error('Error occurred: ' + err.text)
+                    logger.error('Error occurred: %s', str(text), exc_info=True)
                 elif success:
                     logger.info('Login successful')
                     check_ip()
@@ -125,7 +123,6 @@ def main():
         times_retry_login -= 1
         logger.info('{attempt} attempt(s) remaining.'.format(attempt=times_retry_login))
         if times_retry_login <= 0:
-            logger.error('Attempts used up. The program will quit.')
             raise RetryError
         logger.info('Try again in {time} sec. '.format(time=config['interval_retry_connection']))
         sleep(config['interval_retry_connection'])
@@ -140,6 +137,6 @@ if __name__ == '__main__':
     except BaseHTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
     except RetryError:
-        sys.exit(-1)
+        logger.error('Attempts used up. The program will quit.')
     except Exception as e:
-        logger.error("".join(traceback.format_exc()))
+        logger.error("Critical error occurs", exc_info=True)
