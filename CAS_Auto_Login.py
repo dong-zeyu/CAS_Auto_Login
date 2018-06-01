@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
-import json
-import logging
 import os
-import re
 import sys
+import logging
+import json
+import re
 import traceback
+import socket
 import requests
 
 from time import sleep
@@ -71,14 +72,13 @@ def test_network(url):
 
 
 def check_ip():
-    try:
-        import socket
-        conn = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        conn.connect(('172.18.6.71', 12312))
-        ip = conn.recv(128)
-        logger.info("Your ip is: {ip}".format(ip=ip.decode()))
-    except Exception as e:
-        logger.error("Cannot get ip address: {msg}".format(msg=str(e)))
+    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as conn:
+        try:
+            conn.connect(('172.18.6.71', 12312))
+            ip = conn.recv(128)
+            logger.info("Your ip is: {ip}".format(ip=ip.decode()))
+        except Exception as e:
+            logger.error("Cannot get ip address: {msg}".format(msg=str(e)))
 
 
 def main():
