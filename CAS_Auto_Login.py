@@ -111,7 +111,7 @@ def main():
                 success, err = do_login(service, config['username'], config['password'])
                 
                 if err:
-                    logger.error('Error occurred: %s', str(text), exc_info=True)
+                    logger.error('Error occurred: %s', str(err), exc_info=True)
                 elif success:
                     logger.info('Login successful')
                     check_ip()
