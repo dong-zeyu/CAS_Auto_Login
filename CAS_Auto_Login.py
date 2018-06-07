@@ -130,11 +130,12 @@ if __name__ == '__main__':
     try:
         config = load_config()
         while True:
-            main()
+            try:
+                main()
+            except RetryError:
+                logger.error('Attempts used up. Wait for next %d second', config['interval_check_network'])
             sleep(config['interval_check_network'])
     except BaseHTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
-    except RetryError:
-        logger.error('Attempts used up. The program will quit.')
     except Exception as e:
         logger.critical("Critical error occurs", exc_info=True)
