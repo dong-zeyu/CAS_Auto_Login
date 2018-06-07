@@ -3,10 +3,10 @@
 import os
 import sys
 import logging
+import importlib
 import json
 import re
 import traceback
-import socket
 import requests
 
 from time import sleep
@@ -69,19 +69,9 @@ def test_network(url):
             raise BaseHTTPError("Invalid status code {code}".format(code=test.status_code))
 
 
-def check_ip():
-    with socket.socket(socket.AF_INET,socket.SOCK_STREAM) as conn:
-        try:
-            conn.connect(('172.18.6.71', 12312))
-            ip = conn.recv(128)
-            logger.info("Your ip is: {ip}".format(ip=ip.decode()))
-        except Exception as e:
-            logger.error("Cannot get ip address: {msg}".format(msg=str(e)))
-
-
 def main():
     logger.debug('Program started.')
-    
+
     config = load_config()
     times_retry_login = config['max_times_retry_login']
     test_url = config['captive_portal_server']
@@ -114,7 +104,15 @@ def main():
                     logger.error('Error occurred: %s', str(err), exc_info=True)
                 elif success:
                     logger.info('Login successful')
-                    check_ip()
+                    
+                    # define the orperation after login
+                    try:
+                        __import__("post_login").run()
+                    except ModuleNotFoundError:
+                        pass
+                    except Exception as e:
+                        logger.error("Error in executing run() in post_login: %s",e , exc_info=True)
+                    
                     return
         except RequestException as err:
             logger.warn('Network FAILED.')
