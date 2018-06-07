@@ -137,4 +137,4 @@ if __name__ == '__main__':
     except RetryError:
         logger.error('Attempts used up. The program will quit.')
     except Exception as e:
-        logger.error("Critical error occurs", exc_info=True)
+        logger.critical("Critical error occurs", exc_info=True)
