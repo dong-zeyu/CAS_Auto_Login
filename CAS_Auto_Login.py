@@ -18,6 +18,12 @@ from requests.exceptions import RetryError
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 
+def load_config():
+    with open('./config.json') as f:
+        config = json.load(f)
+    return config
+config = load_config()
+
 logging.basicConfig(
     format="[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s",
     datefmt='%Y/%b/%d %H:%M:%S',
@@ -26,11 +32,6 @@ logger = logging.getLogger("CASLogin")
 logger.setLevel(logging.INFO)
 
 login = requests.session()
-
-def load_config():
-    with open('./config.json') as f:
-        config = json.load(f)
-    return config
 
 
 def do_login(url, username, password):
@@ -72,7 +73,9 @@ def test_network(url):
 def main():
     logger.debug('Program started.')
 
+    global config
     config = load_config()
+    
     times_retry_login = config['max_times_retry_login']
     test_url = config['captive_portal_server']
     logger.debug('Configurations successfully imported.')
@@ -128,7 +131,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        config = load_config()
         while True:
             try:
                 main()
