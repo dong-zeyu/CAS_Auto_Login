@@ -34,6 +34,18 @@ logger.setLevel(logging.INFO)
 login = requests.session()
 
 
+def hot_load(module_name):
+    module = __import__(module_name)
+    import importlib
+    
+    # A bug of Python3.6- See https://github.com/python/cpython/pull/972
+    if importlib._bootstrap._find_spec(module_name, None, module) is None:
+        raise ModuleNotFoundError(f"spec not found for the module {module_name!r}", name=module_name)
+    
+    importlib.reload(module)
+    return module
+
+
 def do_login(url, username, password):
     soup_login = BeautifulSoup(login.get(url).content, 'html5lib')
     logger.info('Start to get login information')
@@ -110,7 +122,7 @@ def main():
                     
                     # define the orperation after login
                     try:
-                        __import__("post_login").run()
+                        hot_load("post_login").run()
                     except ModuleNotFoundError:
                         pass
                     except Exception as e:
