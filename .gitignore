@@ -103,7 +103,10 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-config.json
+# for debug and IED
 *.lnk
 *.bat
 .vscode
+
+config.json
+post_login.py
