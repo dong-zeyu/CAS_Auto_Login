@@ -47,30 +47,34 @@ def hot_load(module_name):
 
 
 def do_login(url, username, password):
-    soup_login = BeautifulSoup(login.get(url).content, 'html5lib')
-    logger.info('Start to get login information')
+    content = login.get(url).content
+    try:
+        soup_login = BeautifulSoup(content, 'html5lib')
+        logger.info('Start to get login information')
 
-    info = {}
-    for element in soup_login.find('form', id='fm1').find_all('input'):
-        if element.has_attr('value'):
-            info[element['name']] = element['value']
+        info = {}
+        for element in soup_login.find('form', id='fm1').find_all('input'):
+            if element.has_attr('value'):
+                info[element['name']] = element['value']
 
-    info['username'] = username
-    info['password'] = password
+        info['username'] = username
+        info['password'] = password
 
-    url = 'https://cas.sustc.edu.cn/cas/login?service={}'.format(url)
+        url = 'https://cas.sustc.edu.cn/cas/login?service={}'.format(url)
 
-    logger.info('Login as ' + username)
+        logger.info('Login as ' + username)
 
-    r = login.post(url, data=info, timeout=30)
-    logger.info('Login information posted to the CAS server.')
+        r = login.post(url, data=info, timeout=30)
+        logger.info('Login information posted to the CAS server.')
 
-    soup_response = BeautifulSoup(r.content, 'html5lib')
-    success = soup_response.find('div', {'class': 'success'})
-    err = soup_response.find('div', {'class': 'errors', 'id': 'msg'})
+        soup_response = BeautifulSoup(r.content, 'html5lib')
+        success = soup_response.find('div', {'class': 'success'})
+        err = soup_response.find('div', {'class': 'errors', 'id': 'msg'})
 
-    return success, err
-
+        return success, err
+    except Exception as err:
+        logger.error("Error in login:\n%s", content.decode(), exc_info=True)
+        return False, "Content error"
 
 def test_network(url):
     with login.get(url, timeout=10, allow_redirects=False) as test:
