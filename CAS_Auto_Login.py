@@ -87,21 +87,20 @@ def test_network(url):
 
 
 def main():
-    logger.debug('Program started.')
 
     global config
     config = load_config()
+    logger.debug('Configurations successfully imported.')
     
     times_retry_login = config['max_times_retry_login']
     test_url = config['captive_portal_server']
-    logger.debug('Configurations successfully imported.')
     
     while True:
-        logger.info('Checking network status...')
+        logger.debug('Checking network status...')
         try:
             link = test_network(test_url)
             if not link:
-                logger.info('You are already logged in.')
+                logger.debug('You are already logged in.')
                 return
             else:
                 content = login.get(link, timeout=10).content
@@ -146,6 +145,7 @@ def main():
 
 
 if __name__ == '__main__':
+    logger.info('Program started. Monitoring network...')
     try:
         while True:
             try:
