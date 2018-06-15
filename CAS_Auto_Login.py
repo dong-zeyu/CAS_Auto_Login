@@ -16,7 +16,7 @@ from requests.exceptions import BaseHTTPError
 from requests.exceptions import RequestException
 from requests.exceptions import RetryError
 
-os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
+# os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 
 def load_config():
     with open('./config.json') as f:
