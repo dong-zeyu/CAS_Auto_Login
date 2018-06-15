@@ -31,8 +31,6 @@ logging.basicConfig(
 logger = logging.getLogger("CASLogin")
 logger.setLevel(logging.INFO)
 
-login = requests.session()
-
 
 def hot_load(module_name):
     module = __import__(module_name)
@@ -148,11 +146,12 @@ if __name__ == '__main__':
     logger.info('Program started. Monitoring network...')
     try:
         while True:
-            try:
-                main()
-            except RetryError:
-                logger.error('Attempts used up. Wait for next %d second', config['interval_check_network'])
-            sleep(config['interval_check_network'])
+            with requests.session() as login:
+                try:
+                    main()
+                except RetryError:
+                    logger.error('Attempts used up. Wait for next %d second', config['interval_check_network'])
+                sleep(config['interval_check_network'])
     except BaseHTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
     except Exception as e:
