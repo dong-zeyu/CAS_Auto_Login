@@ -1,0 +1,23 @@
+version: 1
+disable_existing_loggers: False
+root:
+  handlers: [console, file]
+
+loggers:
+  CASLogin:
+    level: INFO
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: default
+  file:
+    class: logging.FileHandler
+    formatter: default
+    filename: login.log
+    encoding: "utf8"
+
+formatters:
+  default: 
+    format: "[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s"
+    datefmt: "%Y/%b/%d %H:%M:%S"

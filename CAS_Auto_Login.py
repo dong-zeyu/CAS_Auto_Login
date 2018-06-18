@@ -3,11 +3,12 @@
 import os
 import sys
 import logging
-import importlib
+import logging.config
 import json
 import re
 import traceback
 import requests
+import yaml
 
 from time import sleep
 from bs4 import BeautifulSoup
@@ -24,12 +25,17 @@ def load_config():
     return config
 config = load_config()
 
-logging.basicConfig(
-    format="[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s",
-    datefmt='%Y/%b/%d %H:%M:%S',
-    handlers=[logging.FileHandler(filename='CASLogin.log', mode='a'), logging.StreamHandler()])
+try:
+    with open("logging.yaml", 'rt') as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+except:
+    logging.basicConfig(
+        format="[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s",
+        datefmt='%Y/%b/%d %H:%M:%S',
+        handlers=[logging.FileHandler(filename='login.log', mode='a'), logging.StreamHandler()])
+    logging.getLogger("CASLogin").setLevel(logging.INFO)
 logger = logging.getLogger("CASLogin")
-logger.setLevel(logging.INFO)
 
 
 def hot_load(module_name):
