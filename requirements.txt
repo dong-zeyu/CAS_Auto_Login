@@ -1,3 +1,4 @@
 requests >= 2.18.0
 beautifulsoup4
 html5lib
+pyyaml
