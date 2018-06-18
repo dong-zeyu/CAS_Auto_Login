@@ -154,7 +154,7 @@ def main():
                     logger.error("Error in executing run() in post_login: %s",e , exc_info=True)
                 
         except RequestException as err:
-            logger.warn('Network FAILED in %s', err.request.url)
+            logger.warn('Network FAILED: %s', err)
             sleep(config['interval_check_network'])
         except BaseHTTPError as err:
             logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
