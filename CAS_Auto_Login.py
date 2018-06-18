@@ -61,7 +61,7 @@ def do_login(url, username, password):
             info['username'] = username
             info['password'] = password
 
-            url = 'https://cas.sustc.edu.cn/cas/login?service={}'.format(url)
+            url = cas_page.url
 
             logger.info('Login as ' + username)
 
