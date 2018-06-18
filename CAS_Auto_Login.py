@@ -45,37 +45,39 @@ def hot_load(module_name):
 
 
 def do_login(url, username, password):
-    content = login.get(url).content
-    try:
-        soup_login = BeautifulSoup(content, 'html5lib')
-        logger.info('Start to get login information')
+    with requests.session() as login:
+        content = login.get(url).content
+        try:
+            soup_login = BeautifulSoup(content, 'html5lib')
+            logger.info('Start to get login information')
 
-        info = {}
-        for element in soup_login.find('form', id='fm1').find_all('input'):
-            if element.has_attr('value'):
-                info[element['name']] = element['value']
+            info = {}
+            for element in soup_login.find('form', id='fm1').find_all('input'):
+                if element.has_attr('value'):
+                    info[element['name']] = element['value']
 
-        info['username'] = username
-        info['password'] = password
+            info['username'] = username
+            info['password'] = password
 
-        url = 'https://cas.sustc.edu.cn/cas/login?service={}'.format(url)
+            url = 'https://cas.sustc.edu.cn/cas/login?service={}'.format(url)
 
-        logger.info('Login as ' + username)
+            logger.info('Login as ' + username)
 
-        r = login.post(url, data=info, timeout=30)
-        logger.info('Login information posted to the CAS server.')
+            r = login.post(url, data=info, timeout=30)
+            logger.info('Login information posted to the CAS server.')
 
-        soup_response = BeautifulSoup(r.content, 'html5lib')
-        success = soup_response.find('div', {'class': 'success'})
-        err = soup_response.find('div', {'class': 'errors', 'id': 'msg'})
+            soup_response = BeautifulSoup(r.content, 'html5lib')
+            success = soup_response.find('div', {'class': 'success'})
+            err = soup_response.find('div', {'class': 'errors', 'id': 'msg'})
 
-        return success, err
-    except Exception as err:
-        logger.error("Error in login:\n%s", content.decode(), exc_info=True)
-        return False, "Content error"
+            return success, err
+        except Exception as err:
+            logger.error("Error in login:\n%s", content.decode(), exc_info=True)
+            return False, "Content error"
+
 
 def test_network(url):
-    with login.get(url, timeout=10, allow_redirects=False) as test:
+    with requests.get(url, timeout=10, allow_redirects=False) as test:
         if 300 > test.status_code >= 200:
             return None
         elif test.status_code == 302:
@@ -101,7 +103,7 @@ def main():
                 logger.debug('You are already logged in.')
                 return
             else:
-                content = login.get(link, timeout=10).content
+                content = requests.get(link, timeout=10).content
                 soup_login = BeautifulSoup(content, 'html5lib')
                 
                 if 'CAS' not in soup_login.title.string:
@@ -146,12 +148,11 @@ if __name__ == '__main__':
     logger.info('Program started. Monitoring network...')
     try:
         while True:
-            with requests.session() as login:
-                try:
-                    main()
-                except RetryError:
-                    logger.error('Attempts used up. Wait for next %d second', config['interval_check_network'])
-                sleep(config['interval_check_network'])
+            try:
+                main()
+            except RetryError:
+                logger.error('Attempts used up. Wait for next %d second', config['interval_check_network'])
+            sleep(config['interval_check_network'])
     except BaseHTTPError as err:
         logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
     except Exception as e:
