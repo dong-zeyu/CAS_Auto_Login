@@ -46,10 +46,12 @@ def hot_load(module_name):
 
 def do_login(url, username, password):
     with requests.session() as login:
-        content = login.get(url).content
+        cas_page = login.get(url)
         try:
-            soup_login = BeautifulSoup(content, 'html5lib')
+            soup_login = BeautifulSoup(cas_page.content, 'html5lib')
+            
             logger.info('Start to get login information')
+            logger.debug("URL: %s\nContent:\n%s", cas_page.url, cas_page.content.decode())
 
             info = {}
             for element in soup_login.find('form', id='fm1').find_all('input'):
@@ -64,15 +66,21 @@ def do_login(url, username, password):
             logger.info('Login as ' + username)
 
             r = login.post(url, data=info, timeout=30)
+
             logger.info('Login information posted to the CAS server.')
+            logger.debug("URL: %s\nContent:\n%s", r.url, r.content.decode())
 
             soup_response = BeautifulSoup(r.content, 'html5lib')
             success = soup_response.find('div', {'class': 'success'})
             err = soup_response.find('div', {'class': 'errors', 'id': 'msg'})
 
+            if success is None and err is None:
+                logger.error("Bad response:\n%s", r.content.decode())
+                err = "Bad response"
+
             return success, err
         except Exception as err:
-            logger.error("Error in login:\n%s", content.decode(), exc_info=True)
+            logger.error("Error in login:\n%s", cas_page.content.decode(), exc_info=True)
             return False, "Content error"
 
 
@@ -119,7 +127,7 @@ def main():
                 success, err = do_login(service, config['username'], config['password'])
                 
                 if err:
-                    logger.error('Error occurred: %s', str(err), exc_info=True)
+                    logger.error('Error occurred: %s', str(err))
                 elif success:
                     logger.info('Login successful')
                     
