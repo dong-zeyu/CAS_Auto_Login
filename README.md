@@ -1,11 +1,18 @@
 # CAS_Auto_Login
+
 SUSTC network account auto login. Coded in Python.
+
 ## Requirements
-Python2.7+
 
-requests==2.11.
+Python3.4+
 
-beautifulsoup4==4.5.3
+requests
+
+beautifulsoup4
+
+html5lib
+
+pyyaml
 
 ## Configuration items
 
@@ -15,6 +22,6 @@ beautifulsoup4==4.5.3
 
 **password**: CAS login password
 
-**interval_retry_connection**: In second. If the status check failed (e.g. the server was down or there is no Internet connection), how long the program will wait before next attempt. Default value is 30.
+**interval_check_network**: In second. Define the interval to check network status. So the program will response in at most *interval_check_network* time after the network is failed. Recommend value is 10.
 
-**max_times_retry_login**: Maximum time the program will try to login to the server. Default value is 5.
+**interval_retry_connection**: In second. If login was failed (e.g. the server was down or error username/password), how long the program will wait before next attempt. Recommend value is 60.
