@@ -148,7 +148,7 @@ def main():
                 
                 # define the orperation after login
                 try:
-                    hot_load("post_login").run()
+                    hot_load("post_login").run(locals())
                 except ModuleNotFoundError:
                     pass
                 except Exception as e:
