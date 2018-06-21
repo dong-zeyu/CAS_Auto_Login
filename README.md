@@ -4,9 +4,9 @@ SUSTC network account auto login. Coded in Python.
 
 ## Requirements
 
-Python3.4+
+Python3.6+
 
-requests
+requests >= 2.18.0
 
 beautifulsoup4
 
