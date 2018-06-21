@@ -1,0 +1,12 @@
+
+import logging
+import re
+
+
+logger = logging.getLogger("Update IP")
+logger.setLevel(logging.INFO)
+
+
+def run(l_var):
+    ip = re.search(r"wlanuserip=(\d+\.\d+.\d+\.\d+)", l_var['rem_link']).group(1)
+    logger.info("Your ip is: {ip}".format(ip=ip.decode()))
