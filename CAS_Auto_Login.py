@@ -170,5 +170,7 @@ def main():
 if __name__ == '__main__':
     try:
         main()
+    except KeyboardInterrupt:
+        sys.exit(0)
     except Exception as e:
         logger.critical("Critical error occurs", exc_info=True)
