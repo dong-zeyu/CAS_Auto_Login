@@ -32,7 +32,7 @@ The following file are either required or optional for this program. Each file m
 
 ### logging.yaml (optional)
 
-Logging configuration. See <https://docs.python.org/3/library/logging.config.html> for detailed information. If not set, the program will log to both console and a file named `login.log`
+Logging configuration. See Python document for [logging](https://docs.python.org/3/library/logging.config.html) for detailed information. If not set, the program will log to both console and a file named `login.log`
 
 ### post_login.py (optional)
 
