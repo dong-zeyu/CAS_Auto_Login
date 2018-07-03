@@ -1,6 +1,6 @@
 # CAS_Auto_Login
 
-SUSTC network account auto login. Coded in Python.
+SUSTech network account auto login. Coded in Python.
 
 ## Requirements
 
@@ -22,7 +22,7 @@ The following file are either required or optional for this program. Each file m
 
 - **captive_portal_server:** see [here](https://www.noisyfox.cn/45.html). You will need to put a URL that will response a status code like `2XX` and  other status code are not accepted. Default is "<http://captive.v2ex.co/generate_204>"
 
-- **username**: Your SUSTC student ID
+- **username**: Your SUSTech student ID
 
 - **password**: CAS login password
 

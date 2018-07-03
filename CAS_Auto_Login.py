@@ -127,7 +127,7 @@ def main():
             soup_login = BeautifulSoup(content, 'html5lib')
             
             if 'CAS' not in soup_login.title.string:
-                logger.warning('Not connected to a SUSTC network')
+                logger.warning('Not connected to a SUSTech network')
                 sleep(config['interval_check_network'])
                 continue
             
@@ -146,7 +146,7 @@ def main():
             elif success:
                 logger.info('Login successful')
                 
-                # define the orperation after login
+                # define the operation after login
                 try:
                     hot_load("post_login").run(locals())
                 except ModuleNotFoundError:
