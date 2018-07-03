@@ -20,7 +20,7 @@ The following file are either required or optional for this program. Each file m
 
 ### config.json (required)
 
-- **captive_portal_server:** see [here](https://www.noisyfox.cn/45.html). Default is "<http://captive.v2ex.co/generate_204>"
+- **captive_portal_server:** see [here](https://www.noisyfox.cn/45.html). You will need to put a URL that will response a status code like `2XX` and  other status code are not accepted. Default is "<http://captive.v2ex.co/generate_204>"
 
 - **username**: Your SUSTC student ID
 
