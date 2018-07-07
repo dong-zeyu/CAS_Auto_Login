@@ -145,7 +145,7 @@ def main():
 
                 # define the orperation after login
                 try:
-                    hot_load("post_login").run(locals())
+                    hot_load("post_login").run(**dict(locals(), **globals()))
                 except ModuleNotFoundError:
                     logger.debug("Failed to import \"post_login\" script.")
                 except Exception as e:
