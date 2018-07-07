@@ -147,7 +147,7 @@ def main():
                 try:
                     hot_load("post_login").run(locals())
                 except ModuleNotFoundError:
-                    pass
+                    logger.debug("Failed to import \"post_login\" script.")
                 except Exception as e:
                     logger.error("Error in executing run() in post_login: %s", e, exc_info=True)
 
