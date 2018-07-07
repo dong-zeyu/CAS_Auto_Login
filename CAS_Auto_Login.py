@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import os
 import sys
 import logging
 import logging.config
 import json
 import re
-import traceback
 import requests
 import yaml
 
@@ -15,7 +13,6 @@ from bs4 import BeautifulSoup
 
 from requests.exceptions import BaseHTTPError
 from requests.exceptions import RequestException
-from requests.exceptions import RetryError
 
 # os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 sys.path.insert(0, '')
@@ -24,7 +21,7 @@ try:
     with open("logging.yaml", 'rt') as f:
         config = yaml.safe_load(f.read())
         logging.config.dictConfig(config)
-except:
+except Exception:
     logging.basicConfig(
         format="[%(asctime)s.%(msecs)03d] - %(levelname)s - %(message)s",
         datefmt='%Y/%b/%d %H:%M:%S',
@@ -36,11 +33,11 @@ logger = logging.getLogger("CASLogin")
 def hot_load(module_name):
     module = __import__(module_name)
     import importlib
-    
+
     # A bug of Python3.6- See https://github.com/python/cpython/pull/972
     if importlib._bootstrap._find_spec(module_name, None, module) is None:
         raise ModuleNotFoundError(f"spec not found for the module {module_name!r}", name=module_name)
-    
+
     importlib.reload(module)
     return module
 
@@ -50,7 +47,7 @@ def do_login(url, username, password):
         cas_page = login.get(url)
         try:
             soup_login = BeautifulSoup(cas_page.content, 'html5lib')
-            
+
             logger.info('Start to get login information')
             logger.debug("URL: %s\nContent:\n%s", cas_page.url, cas_page.content.decode())
 
@@ -98,7 +95,7 @@ def test_network(url):
 def wait_network(url, waiting_interval):
     while True:
         link = test_network(url)
-        if not link is None:
+        if link is not None:
             return link
         sleep(waiting_interval)
 
@@ -125,37 +122,37 @@ def main():
             red_page.close()
 
             soup_login = BeautifulSoup(content, 'html5lib')
-            
+
             if 'CAS' not in soup_login.title.string:
                 logger.warning('Not connected to a SUSTech network')
                 sleep(config['interval_check_network'])
                 continue
-            
+
             logger.info('You are offline. Starting login...')
-            
+
             rem_link = re.search(r'window\.location = \'(.*)\';', soup_login.text).group(1)
             hostname = 'http://enet.10000.gd.cn:10001/sz/sz112/'
             service = hostname + rem_link
-            
+
             success, err = do_login(service, config['username'], config['password'])
-            
+
             if err:
                 logger.error('Error occurred: %s', str(err))
                 logger.info('Try again in {time} sec. '.format(time=config['interval_retry_connection']))
                 sleep(config['interval_retry_connection'])
             elif success:
                 logger.info('Login successful')
-                
+
                 # define the operation after login
                 try:
-                    hot_load("post_login").run(locals())
+                    hot_load("post_login").run(**dict(locals(), **globals()))
                 except ModuleNotFoundError:
-                    pass
+                    logger.debug("Failed to import \"post_login\" script.")
                 except Exception as e:
-                    logger.error("Error in executing run() in post_login: %s",e , exc_info=True)
-                
+                    logger.error("Error in executing run() in post_login: %s", e, exc_info=True)
+
         except RequestException as err:
-            # We use this workaround before this issue is solved - https://github.com/requests/requests/issues/4692 
+            # We use this workaround before this issue is solved - https://github.com/requests/requests/issues/4692
             if err.request is not None:
                 logger.warn("Network FAILED in %s", err.request.url)
             else:
@@ -164,11 +161,12 @@ def main():
         except BaseHTTPError as err:
             logger.error('{msg}, consider updating \'captive_portal_server\''.format(msg=str(err)))
             sleep(config['interval_check_network'])
-        
-        
+
 
 if __name__ == '__main__':
     try:
         main()
+    except KeyboardInterrupt:
+        sys.exit(0)
     except Exception as e:
         logger.critical("Critical error occurs", exc_info=True)

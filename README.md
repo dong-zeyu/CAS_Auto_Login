@@ -36,4 +36,4 @@ Logging configuration. See Python document for [logging](https://docs.python.org
 
 ### post_login.py (optional)
 
-This program provides a callback function after a successful login operation in order to get the ip address, update DDNS information, run a specific program and etc.. The program will hot load `post_login.py` and call `post_login.run` with parameter `local()`. You can refer to the code to see what information you will have in `local()`. Please make sure that your script have a function named `run` with exactly one positional parameter.
+This program provides a callback function after a successful login operation in order to get the ip address, update DDNS information, run a specific program and etc.. The program will hot load `post_login.py` and call `post_login.run` with keyword arguments from `locals()` and `globals()`. You can refer to the code to see what information you will have in the keyword arguments. Please make sure that your script have a function named `run` with `**kwargs` to accept all the keywords arguments.
