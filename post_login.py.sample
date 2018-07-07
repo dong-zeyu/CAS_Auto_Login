@@ -3,7 +3,7 @@ import logging
 import re
 
 
-logger = logging.getLogger("Update IP")
+logger = logging.getLogger("PostLogin")
 logger.setLevel(logging.INFO)
 
 
